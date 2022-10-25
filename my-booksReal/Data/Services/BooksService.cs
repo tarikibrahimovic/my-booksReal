@@ -1,4 +1,5 @@
-﻿using my_booksReal.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using my_booksReal.Data.Models;
 using my_booksReal.Data.ViewModel;
 using System.Threading;
 
@@ -51,21 +52,23 @@ namespace my_booksReal.Data.Services
 
         //public Book GetBookById(int bookId) => _context.Books.FirstOrDefault(n => n.Id == bookId);
 
-        public BookWithAuthorsVM GetBookById(int bookId)
+        public Book GetBookById(int bookId)
         {
-            var _bookWithAuthors = _context.Books.Where(n => n.Id == bookId).Select(book => new BookWithAuthorsVM()
-            {
-                Title = book.Title,
-                Description = book.Description,
-                IsRead = book.IsRead,
-                DateRead = book.IsRead ? book.DateRead.Value : null,
-                Rate = book.IsRead ? book.Rate.Value : null,
-                Genre = book.Genre,
-                CoverUrl = book.CoverUrl,
-                PublisherName = book.Publisher.Name,
-                AuthorNames = book.Book_Authors.Select(n => n.Author.FullName).ToList()
-            }).FirstOrDefault();
-            return _bookWithAuthors;
+            //var _bookWithAuthors = _context.Books.Where(n => n.Id == bookId).Select(book => new BookWithAuthorsVM()
+            //{
+            //    Title = book.Title,
+            //    Description = book.Description,
+            //    IsRead = book.IsRead,
+            //    DateRead = book.IsRead ? book.DateRead.Value : null,
+            //    Rate = book.IsRead ? book.Rate.Value : null,
+            //    Genre = book.Genre,
+            //    CoverUrl = book.CoverUrl,
+            //    PublisherName = book.Publisher.Name,
+            //    AuthorNames = book.Book_Authors.Select(n => n.Author.FullName).ToList()
+            //}).FirstOrDefault();
+            //return _bookWithAuthors;
+
+            return _context.Books.Where(n => n.Id == bookId).Include(e => e.Publisher).FirstOrDefault();
         }
 
         public Book UpdateBookById(int bookId, BookVM book)
