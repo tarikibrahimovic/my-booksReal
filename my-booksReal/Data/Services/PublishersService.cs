@@ -1,5 +1,7 @@
 ﻿using my_booksReal.Data.Models;
 using my_booksReal.Data.ViewModel;
+using my_booksReal.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace my_booksReal.Data.Services
 {
@@ -11,14 +13,16 @@ namespace my_booksReal.Data.Services
             _context = context;
         }
 
-        public void AddPublisher(PublisherVM publisher)
+        public Publisher AddPublisher(PublisherVM publisher)
         {
+            if (StringStartsWithNumber(publisher.Name)) throw new PublisherNameException("Name starts with number");
             var _publisher = new Publisher()
             {
                 Name = publisher.Name,
             };
             _context.Publishers.Add(_publisher);
             _context.SaveChanges();
+            return _publisher;
         }
 
         public void DeletePublisherById(int id)
@@ -29,11 +33,22 @@ namespace my_booksReal.Data.Services
                 _context.Publishers.Remove(_publisher);
                 _context.SaveChanges();
             }
+            else
+            {
+                throw new Exception($"The publisher with id: {id} does not exist");
+            }
         }
 
-        //public PublisherWIthBooksAndAuthorsVM GetPublisherData(int publisherId)
-        //{
-
-        //}
+        private bool StringStartsWithNumber(string name)
+        {
+            if(Regex.IsMatch(name, @"^\d"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        } 
     }
 }
